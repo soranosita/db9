@@ -27,8 +27,11 @@ jobs:
           IMAGEURL=$(echo $JSON_DATA | jq -r '.data[0].track.imageurl')
   
           PREVIOUS_SONG=$(cat data/previous_songs.json | jq -r '.[-1].song')
+          echo $JSON_DATA
+          echo $SONG / $PREVIOUS_SONG
 
           if [ "$SONG" != "$PREVIOUS_SONG" ]; then
+            echo New song: $SONG
             NEW_ENTRY="{\"song\":\"$SONG\",\"album\":\"$ALBUM\",\"imageUrl\":\"$IMAGEURL\",\"started\":$STARTED}"
             jq --slurpfile new_entry <(echo "$NEW_ENTRY") '. + $new_entry' data/previous_songs.json > data/updated_songs.json
             mv data/updated_songs.json data/previous_songs.json
