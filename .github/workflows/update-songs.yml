@@ -1,0 +1,43 @@
+name: Update Songs
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+
+jobs:
+  fetch-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq -y
+
+      - name: Fetch JSON Data and Update Songs
+        run: |
+          JSON_DATA=$(curl -s -H "Content-Type: application/json" ${{ secrets.ENDPOINT_URL }})
+          SONG=$(echo $JSON_DATA | jq -r '.data[0].song')
+          STARTED=$(echo $JSON_DATA | jq -r '.data[0].track.started')
+          ALBUM=$(echo $JSON_DATA | jq -r '.data[0].track.album')
+          IMAGEURL=$(echo $JSON_DATA | jq -r '.data[0].track.imageurl')
+  
+          PREVIOUS_SONG=$(cat data/previous_songs.json | jq -r '.[-1].song')
+
+          if [ "$SONG" != "$PREVIOUS_SONG" ]; then
+            NEW_ENTRY="{\"song\":\"$SONG\",\"album\":\"$ALBUM\",\"imageUrl\":\"$IMAGEURL\",\"started\":$STARTED}"
+            jq --slurpfile new_entry <(echo "$NEW_ENTRY") '. + $new_entry' data/previous_songs.json > data/updated_songs.json
+            mv data/updated_songs.json data/previous_songs.json
+
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add data/previous_songs.json
+            git commit -m "Update songs"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
