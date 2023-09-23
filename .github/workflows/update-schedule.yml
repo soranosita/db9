@@ -1,4 +1,4 @@
-name: Update DJs
+name: Update Schedule
 
 on:
   workflow_dispatch:
@@ -23,13 +23,13 @@ jobs:
 
       - name: Run Python Script
         run: |
-          python scripts/get_djs.py > data/djs.json
+          python scripts/get_schedule.py > data/schedule.json
         working-directory: ${{ github.workspace }}
 
-      - name: Commit and Update DJs
+      - name: Commit and Update Schedule
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add data/djs.json
-          git commit -m "Update DJs"
+          git add data/schedule.json
+          git commit -m "Update Schedule"
           git push
