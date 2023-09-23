@@ -1,0 +1,35 @@
+name: Update DJs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  execute-python-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install Dependencies
+        run: |
+          pip install requests bs4
+        working-directory: ${{ github.workspace }}
+
+      - name: Run Python Script
+        run: |
+          python scripts/get_djs.py > data/djs.json
+        working-directory: ${{ github.workspace }}
+
+      - name: Commit and Update DJs
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/djs.json
+          git commit -m "Update DJs"
+          git push
