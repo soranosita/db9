@@ -13,11 +13,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Install jq
-        run: |
-          sudo apt-get update
-          sudo apt-get install jq -y
-
       - name: Fetch JSON Data and Update Songs
         run: |
           JSON_DATA=$(curl -s -H "Content-Type: application/json" "https://eu6.fastcast4u.com:2199/external/rpc.php?m=streaminfo.get&username=andorint")
