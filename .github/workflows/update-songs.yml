@@ -25,7 +25,7 @@ jobs:
           echo $JSON_DATA
           echo $SONG / $PREVIOUS_SONG
 
-          if [ "$SONG" != "$PREVIOUS_SONG" ]; then
+          if [ "$SONG" != "None" ] && [ "$SONG" != "$PREVIOUS_SONG" ]; then
             echo New song: $SONG
             NEW_ENTRY="{\"song\":\"$SONG\",\"album\":\"$ALBUM\",\"imageUrl\":\"$IMAGEURL\",\"started\":$STARTED}"
             jq --slurpfile new_entry <(echo "$NEW_ENTRY") '. + $new_entry' data/previous_songs.json > data/updated_songs.json
